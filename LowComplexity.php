@@ -7,21 +7,16 @@ class Reduction
         $nbNights = 0;
        
         foreach ($declinations as $declination) {
-            $isAttributNotEligible = !$declination->getDeclination()->getProduitAttributeValeurFromIdAttribut(\Attribut::KEY_STAY_PERIOD) &&
-                !$declination->getDeclination()->getProduitAttributeValeurFromIdAttribut(\Attribut::KEY_VISIT);
-        
-            if ($isAttributNotEligible) {
-                continue;
-            }  
-
+            $isAttributIsEligible = $declination->getDeclination()->getProduitAttributeValeurFromIdAttribut(\Attribut::KEY_STAY_PERIOD) ||
+                $declination->getDeclination()->getProduitAttributeValeurFromIdAttribut(\Attribut::KEY_VISIT);
+            
             $nbNights += $declination->getDeclination()->getNbNightDeclination();
             $validDeclinations[] = $declination;
 
-            if ($nbNights >= ($this->getBoughtNights() + $this->getFreeNights())) {
+            if ($isAttributIsEligible && $nbNights >= ($this->getBoughtNights() + $this->getFreeNights())) {
                 $this->setValidDeclinationsForSale($validDeclinations);
                 return true;
             }
-        
         }
 
         return false;
