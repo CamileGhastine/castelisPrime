@@ -6,12 +6,12 @@ class Reduction
         $valid = false;
         $validDeclinations = array();
         $nbNights = 0;
-
+       
         foreach ($declinations as $declination) {
-            if (
-                !$declination->getDeclination()->getProduitAttributeValeurFromIdAttribut(\Attribut::KEY_STAY_PERIOD) &&
-                !$declination->getDeclination()->getProduitAttributeValeurFromIdAttribut(\Attribut::KEY_VISIT)
-            ) {
+            $isAttributNotEligible = !$declination->getDeclination()->getProduitAttributeValeurFromIdAttribut(\Attribut::KEY_STAY_PERIOD) &&
+                !$declination->getDeclination()->getProduitAttributeValeurFromIdAttribut(\Attribut::KEY_VISIT);
+        
+            if ($isAttributNotEligible) {
                 continue;
             }  
 
@@ -64,6 +64,8 @@ class Reduction
             return ($this->getPercentage() / 100) * $totalPrice;
         }
     }
+
+
 }
 
 
