@@ -24,11 +24,13 @@ class Reduction
 
     public function calculateValue()
     {
+        if ($this->getUnit() === self::UNIT_EURO) return $this->calculateValueForEuro() ;
+        if ($this->getUnit() === self::UNIT_PERCENT) return $this->calculateValueForPercentage();
+    }
+
+    private function calculateValueForEuro() {
         $value = 0;
         $totalPrice = 0;
-        $decrementedValue = $this->getPercentage();
-
-        if($this->getUnit() === self::UNIT_EURO || $this->getUnit() === self::UNIT_PERCENT) return;
 
         foreach ($this->getValidDeclinationsForSale() as $declination) {
             $declinationSale = 0;
@@ -37,27 +39,35 @@ class Reduction
             /* @var $declination \LogiCE\Entity\Order\Declination */
             $totalPrice += $currentPrice;
 
-            if ($this->getUnit() === self::UNIT_EURO && !$decrementedValue <= 0) {
+            if (!$decrementedValue <= 0) {
                 $decrementedValue -= $currentPrice <= $decrementedValue ? $currentPrice : $currentPrice - $decrementedValue;
-            }
-            
-            if ($this->getUnit() === self::UNIT_PERCENT) {
-                $declinationSale = ($this->getPercentage() / 100) * $currentPrice;
             }
 
             $this->updateCurrentPriceForDeclination($declination, $declinationSale);
             $this->addSalesToDeclination($declination, $declinationSale);
         }
 
-        if ($this->getUnit() === self::UNIT_EURO) {
-            return $this->getPercentage() - $decrementedValue;
-        }
-        
-        if ($this->getUnit() === self::UNIT_PERCENT) {
-            return ($this->getPercentage() / 100) * $totalPrice;
-        }
+        return $this->getPercentage() - $decrementedValue;
     }
 
+    private function calculateValueForPercentage() {
+        $value = 0;
+        $totalPrice = 0;
+        $decrementedValue = $this->getPercentage();
+
+        foreach ($this->getValidDeclinationsForSale() as $declination) {
+            $declinationSale = 0;
+            $currentPrice = $this->getCurrentPriceForDeclination($declination);
+
+            /* @var $declination \LogiCE\Entity\Order\Declination */
+            $totalPrice += $currentPrice;
+            $declinationSale = ($this->getPercentage() / 100) * $currentPrice;
+            $this->updateCurrentPriceForDeclination($declination, $declinationSale);
+            $this->addSalesToDeclination($declination, $declinationSale);
+        }
+        
+        return ($this->getPercentage() / 100) * $totalPrice;
+    }
 
 }
 
