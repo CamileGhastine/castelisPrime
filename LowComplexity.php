@@ -3,7 +3,6 @@
 class Reduction 
 {
     public function checkDeclinationsForValue($declinations) {
-        $valid = false;
         $validDeclinations = array();
         $nbNights = 0;
        
@@ -19,14 +18,13 @@ class Reduction
             $validDeclinations[] = $declination;
 
             if ($nbNights >= ($this->getBoughtNights() + $this->getFreeNights())) {
-                $valid = true;
                 $this->setValidDeclinationsForSale($validDeclinations);
-                break;
+                return true;
             }
         
         }
 
-        return $valid;
+        return false;
     }
 
     public function calculateValue()
